@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="ms"><head><meta charset="utf-8"><title>Nutri Smart</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+:root{--ink:#2f4a3a;--bg:#ffdcea;--panel:#fffafc;--red:#ec6aa5;--yel:#ffd75e;--grn:#5cc07f;--blu:#6fbf8e;--sky:#ffe6f0;--gr:#a8e6b0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#5a2d45;--panel:#fff6fa}}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:var(--bg);font-family:"Trebuchet MS","Segoe UI",system-ui,sans-serif;color:var(--ink);display:flex;justify-content:center}
+#app{width:100%;max-width:760px;padding:12px 12px 70px;position:relative;z-index:1}
+.flora{position:fixed;left:0;right:0;display:flex;justify-content:space-between;font-size:32px;pointer-events:none;z-index:0;padding:0 8px}
+.flora.t{top:calc(4px + env(safe-area-inset-top,0px));opacity:.6}.flora.b{bottom:calc(2px + env(safe-area-inset-bottom,0px));font-size:38px}
+.plants{position:absolute;bottom:44px;left:0;right:0;display:flex;justify-content:space-around;font-size:24px;z-index:1}
+.scr{display:none}.scr.on{display:block}
+h1{font-size:clamp(34px,9vw,58px);margin:6px 0;text-align:center;color:var(--red);text-shadow:0 4px 0 #fff,0 7px 0 #a8e6b0;letter-spacing:2px}
+h1 small{display:block;font-size:.4em;letter-spacing:0;color:#3e9a5c;text-shadow:0 2px 0 #fff}
+.btn{display:block;width:100%;margin:10px auto;padding:14px;font:inherit;font-weight:800;font-size:18px;color:#fff;background:var(--red);border:3px solid var(--ink);border-radius:14px;box-shadow:0 5px 0 var(--ink);cursor:pointer}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}.btn:focus-visible{outline:4px solid var(--yel)}
+.btn.g{background:var(--grn)}.btn.b{background:var(--blu)}.btn.y{background:var(--yel);color:var(--ink)}
+.menuwrap{max-width:360px;margin:0 auto}
+.panel{background:var(--panel);border:3px solid var(--ink);border-radius:16px;padding:14px;box-shadow:0 5px 0 var(--ink);margin:10px 0}
+.scene{position:relative;height:200px;border:3px solid var(--ink);border-radius:16px;overflow:hidden;background:linear-gradient(var(--sky),#e8f8ff)}
+.ground{position:absolute;left:0;right:0;bottom:0;height:46px;background:repeating-linear-gradient(90deg,#b8602a 0 38px,#8f4518 38px 40px);border-top:12px solid var(--gr)}
+.hill{position:absolute;bottom:46px;border-radius:50% 50% 0 0;background:var(--gr);opacity:.7}
+.cloud{position:absolute;font-size:34px;animation:drift 30s linear infinite}
+@keyframes drift{from{left:-10%}to{left:105%}}
+.pipe{position:absolute;bottom:46px;right:2%;width:46px;height:56px;background:var(--grn);border:3px solid var(--ink);border-radius:4px}
+.pipe:before{content:"";position:absolute;left:-7px;right:-7px;top:-3px;height:18px;background:var(--grn);border:3px solid var(--ink);border-radius:4px}
+.hero{position:absolute;bottom:58px;width:34px;height:46px;transition:left .9s ease-in-out;z-index:3}
+.hero i{position:absolute;display:block}
+.cap{left:2px;top:0;width:30px;height:14px;background:var(--red);border-radius:15px 15px 3px 3px;border:2px solid var(--ink)}
+.cap:after{content:"";position:absolute;right:-8px;bottom:-2px;width:14px;height:6px;background:var(--red);border:2px solid var(--ink);border-radius:3px}
+.face{left:4px;top:12px;width:26px;height:16px;background:#ffd2a0;border:2px solid var(--ink);border-radius:6px 6px 10px 10px}
+.face:before{content:"";position:absolute;left:14px;top:3px;width:4px;height:5px;background:var(--ink);border-radius:2px}
+.body{left:3px;top:27px;width:28px;height:19px;background:var(--blu);border:2px solid var(--ink);border-radius:6px}
+.hero.walk{animation:bob .25s infinite alternate}@keyframes bob{to{transform:translateY(-6px)}}
+.hero.jump{animation:jump .5s}@keyframes jump{50%{transform:translateY(-34px)}}
+.blk{position:absolute;bottom:112px;width:42px;height:42px;background:var(--yel);border:3px solid var(--ink);border-radius:6px;font-weight:900;font-size:26px;text-align:center;line-height:36px;color:#a55a00;transition:left .9s ease-in-out;z-index:2}
+.blk.hit{animation:hit .4s;background:#d9a441}@keyframes hit{50%{transform:translateY(-14px)}}
+.coin{position:absolute;font-size:26px;z-index:4;animation:cn 1s forwards}@keyframes cn{to{transform:translateY(-60px);opacity:0}}
+.boss{position:absolute;right:4%;bottom:50px;font-size:70px;z-index:2;display:none;transition:.3s}
+.boss.hurt{animation:sh .4s}@keyframes sh{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.hp{position:absolute;right:4%;top:8px;width:110px;height:14px;border:2px solid var(--ink);background:#fff;border-radius:8px;overflow:hidden;display:none;z-index:5}
+.hp b{display:block;height:100%;background:var(--red);transition:width .4s}
+.hud{display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap;font-weight:800;color:#fff;text-shadow:0 1px 0 var(--ink);margin-bottom:8px}
+.hud span{background:rgba(47,110,75,.85);padding:5px 10px;border-radius:10px}
+.q{font-size:clamp(17px,4vw,21px);font-weight:800;margin:0 0 8px}
+.tmw{position:relative;height:22px;border:3px solid var(--ink);border-radius:12px;background:#fff;overflow:hidden;margin-bottom:10px}.tmw b{display:block;height:100%;width:100%;background:var(--grn);transition:width 1s linear}.tmw span{position:absolute;left:0;right:0;top:0;text-align:center;font-weight:900;font-size:13px;line-height:16px}
+.opt{background:#fff;color:var(--ink);text-align:left;font-size:16px}
+.opt.ok{background:var(--grn);color:#fff}.opt.no{background:var(--red);color:#fff}
+.fb{font-weight:900;font-size:22px;margin:6px 0}.fb.ok{color:#168a16}.fb.no{color:var(--red)}
+.map{display:grid;gap:10px}
+.wc{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;background:var(--panel);border:3px solid var(--ink);border-radius:14px;padding:10px;box-shadow:0 4px 0 var(--ink);cursor:pointer;font:inherit;color:var(--ink);text-align:left;width:100%}
+.wc[disabled]{filter:grayscale(1);opacity:.7;cursor:not-allowed}.wc .ic{font-size:40px;text-align:center}
+.wc b{font-size:17px}.wc small{display:block}.tag{font-weight:900;font-size:13px;padding:3px 8px;border-radius:8px;background:var(--grn);color:#fff}.tag.l{background:#777}
+.big{font-size:clamp(34px,9vw,56px);text-align:center;font-weight:900;margin:8px 0}
+.stat{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-weight:700}.stat div{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:8px}
+.dance{display:flex;justify-content:center;height:80px;position:relative}.dance .hero{position:relative;bottom:auto;transform:scale(1.8);transform-origin:bottom;animation:bob .3s infinite alternate;margin-top:30px}
+.snd{position:fixed;right:10px;top:calc(10px + env(safe-area-inset-top,0px));z-index:9;width:44px;height:44px;border-radius:50%;border:3px solid var(--ink);background:var(--yel);font-size:20px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<div class="flora t"><span>🌸</span><span>🌿</span><span>🌼</span><span>🌿</span><span>🌷</span></div><div class="flora b"><span>🌷</span><span>🌿</span><span>🌸</span><span>🌱</span><span>🌼</span><span>🌿</span><span>🌺</span></div>
+<button class="snd" id="snd" aria-label="Bunyi" onclick="togSnd()">🔊</button>
+<div id="app">
+<section class="scr on" id="menu"><div class="menuwrap">
+<h1>NUTRI SMART<small>🌸 Kuiz Pemakanan Tingkatan 3 🌿</small></h1>
+<div class="dance"><div class="hero"><i class="cap"></i><i class="face"></i><i class="body"></i></div></div>
+<div style="text-align:center;font-size:30px">☁️ 🪙 🍄 ⭐</div>
+<p style="text-align:center;color:var(--ink);font-weight:700">Pendidikan Kesihatan Tingkatan 3 · Pemakanan</p>
+<button class="btn g" onclick="toMap()">START GAME</button>
+<button class="btn b" onclick="show('how')">HOW TO PLAY</button>
+<button class="btn y" onclick="show('about')">ABOUT</button></div></section>
+
+<section class="scr" id="how"><div class="panel"><h2>Cara Bermain</h2><ol style="line-height:1.7;padding-left:20px">
+<li>Mula dengan <b>3 nyawa</b> ❤️❤️❤️.</li><li>Jawab 5 soalan setiap dunia. Jawapan betul = <b>100 mata</b> 🪙.</li><li>Jawapan salah menolak <b>1 nyawa</b>.</li><li>Setiap soalan ada <b>25 saat</b>. Jika masa tamat, anda hilang <b>1 nyawa</b>.</li><li>Selesaikan dunia untuk membuka dunia seterusnya.</li><li>Kalahkan Final Boss di Dunia 5 untuk menang! 👾</li></ol>
+<button class="btn" onclick="show('menu')">BACK</button></div></section>
+<section class="scr" id="about"><div class="panel"><h2>Tentang</h2><p>Permainan kuiz pemakanan untuk Pendidikan Kesihatan Tingkatan 3. 5 dunia, 25 soalan, satu pemain. Watak dan grafik adalah rekaan original.</p><p><b>Nota BMI:</b> soalan BMI ialah latihan pengiraan sahaja. Bagi remaja, tafsiran BMI mesti mengambil kira umur dan jantina melalui carta pertumbuhan, bukan kategori BMI dewasa.</p><button class="btn" onclick="show('menu')">BACK</button></div></section>
+
+<section class="scr" id="map"><h1 style="font-size:28px">PETA DUNIA</h1>
+<div class="hud"><span id="mS">Mata: 0</span><span id="mL">❤️❤️❤️</span><span id="mT">⭐ 0/15</span></div>
+<div class="map" id="mapList"></div><button class="btn y" onclick="show('menu')">HOME</button></section>
+
+<section class="scr" id="game"><div class="hud"><span id="gW"></span><span id="gS">Mata: 0</span><span id="gL"></span><span id="gQ"></span></div>
+<div class="scene" id="scene"><div class="cloud" style="top:14px">☁️</div><div class="cloud" style="top:50px;animation-delay:-14s">☁️</div>
+<div class="hill" style="left:-5%;width:40%;height:70px"></div><div class="hill" style="left:45%;width:35%;height:50px"></div>
+<div class="plants"><span>🌷</span><span>🌿</span><span>🌸</span><span>🌱</span><span>🌼</span><span>🌿</span></div><div class="pipe"></div><div class="ground"></div><div class="hp" id="hp"><b id="hpb" style="width:100%"></b></div><div class="boss" id="boss">👾</div>
+<div class="blk" id="blk">?</div><div class="hero walk" id="hero"><i class="cap"></i><i class="face"></i><i class="body"></i></div></div>
+<div class="panel"><div class="tmw"><b id="tmb"></b><span id="tmt">25 s</span></div><p class="q" id="qt"></p><div id="opts"></div><div id="fbw" hidden><div class="fb" id="fb"></div><div id="ex"></div><button class="btn g" id="nx" onclick="next()">NEXT</button></div></div></section>
+
+<section class="scr" id="result"><div class="panel"><div class="big" id="rT"></div><div class="dance"><div class="hero"><i class="cap"></i><i class="face"></i><i class="body"></i></div></div>
+<div class="stat" id="rS"></div><button class="btn g" onclick="newGame()">PLAY AGAIN</button><button class="btn b" onclick="show('menu')">BACK TO HOME</button></div></section>
+</div>
+<script>
+const W=[{n:"Extremely Easy",d:"Dunia 1",i:"🌱",sky:"#ffe6f0",gr:"#a8e6b0"},
+{n:"Super Easy",d:"Dunia 2",i:"🌷",sky:"#e6f7e6",gr:"#93d9a0"},
+{n:"Easy",d:"Dunia 3",i:"🌸",sky:"#ffeaf3",gr:"#b5ecbb"},
+{n:"Hard",d:"Dunia 4",i:"🌿",sky:"#f1fbe9",gr:"#f4b6d0"},
+{n:"Impossible",d:"Dunia 5 · Final Boss",i:"👾",sky:"#ffd9e6",gr:"#8fd6a0"}];
+// [soalan,[A,B,C],indeks betul,penerangan]
+const Q=[[
+["Berapakah bilangan kelas makanan?",["5","7","9"],1,"Ada 7 kelas makanan: karbohidrat, protein, lemak, vitamin, mineral, serat dan air."],
+["Fungsi utama karbohidrat ialah...",["Membina sel baharu","Menjadi sumber tenaga utama","Melawan penyakit"],1,"Karbohidrat dipecahkan menjadi glukosa untuk membekalkan tenaga."],
+["Mengapakah kita perlu minum air secukupnya setiap hari?",["Menambah berat badan","Menggantikan sarapan","Mengawal suhu badan dan membantu penghadaman"],2,"Air mengawal suhu badan, mengangkut nutrien dan membantu penghadaman."],
+["Mengapakah sarapan penting?",["Memberi tenaga untuk memulakan hari dan membantu fokus","Supaya tidak perlu makan tengah hari","Supaya cepat mengantuk"],0,"Sarapan membekalkan tenaga dan glukosa untuk otak selepas berpuasa semalaman."],
+["Serat dalam makanan berfungsi untuk...",["Membina otot","Memberi tenaga segera","Melancarkan pergerakan usus"],2,"Serat dalam sayur dan buah mencegah sembelit."]],
+[
+["Protein berfungsi untuk...",["Memberi tenaga segera","Membina dan membaiki tisu badan","Melarutkan vitamin"],1,"Protein membina dan membaiki sel serta tisu."],
+["Yang manakah sumber protein?",["Gula-gula","Minyak sayuran","Telur dan ikan"],2,"Telur, ikan, ayam, daging dan kekacang kaya dengan protein."],
+["Fungsi lemak ialah...",["Menebat haba dan melindungi organ dalaman","Menguatkan gigi","Melancarkan penghadaman"],0,"Lemak menebat haba, melindungi organ dan menyimpan tenaga."],
+["Kekurangan vitamin C menyebabkan penyakit...",["Rabun malam","Riket","Skurvi"],2,"Vitamin C diperlukan untuk gusi dan kulit yang sihat; kekurangannya menyebabkan skurvi."],
+["Mineral yang menguatkan tulang dan gigi ialah...",["Iodin","Kalsium","Zat besi"],1,"Kalsium terdapat dalam susu, ikan bilis dan sayur hijau."]],
+[
+["Dalam Piramid Makanan Malaysia, makanan di puncak piramid perlu diambil...",["Paling banyak","Sebagai makanan utama","Paling sedikit (gula, garam, lemak dan minyak)"],2,"Puncak piramid ialah gula, garam, minyak dan lemak yang perlu diambil secara sederhana."],
+["Mengikut Pinggan Sihat Malaysia, separuh pinggan diisi dengan...",["Nasi","Sayur dan buah","Lauk daging"],1,"Suku-Suku-Separuh: separuh sayur dan buah, suku karbohidrat, suku protein."],
+["Pemakanan seimbang bermaksud...",["Makan banyak makanan kegemaran","Makan sayur sahaja","Mengambil semua kelas makanan dalam kuantiti yang sesuai"],2,"Pemakanan seimbang mengandungi semua kelas makanan mengikut keperluan badan."],
+["Yang manakah hidangan mengikut Suku-Suku-Separuh?",["Nasi separuh pinggan, ayam goreng suku, sayur suku","Nasi suku, ikan suku, sayur dan buah separuh","Nasi goreng satu pinggan penuh"],1,"Hidangan bagi satu suku nasi, satu suku ikan dan separuh sayur sepadan dengan panduan ini."],
+["Pengambilan sayur dan buah yang disyorkan sehari ialah...",["1 hidangan sayur dan 1 buah","3 hidangan sayur dan 2 hidangan buah","5 hidangan buah sahaja"],1,"Syor ialah 3 hidangan sayur dan 2 hidangan buah sehari."]],
+[
+["Formula BMI = berat (kg) ÷ tinggi² (m). Berapakah BMI murid berat 55 kg dan tinggi 1.60 m?",["18.5","34.4","21.5"],2,"55 ÷ (1.60 × 1.60) = 55 ÷ 2.56 = 21.5. Ini latihan pengiraan; remaja perlu ditafsir menggunakan carta pertumbuhan mengikut umur dan jantina."],
+["Hitung BMI murid berat 45 kg dan tinggi 1.5 m.",["20.0","30.0","67.5"],0,"45 ÷ (1.5 × 1.5) = 45 ÷ 2.25 = 20.0. Tafsiran remaja menggunakan carta pertumbuhan."],
+["1 g karbohidrat dan protein = 4 kcal, 1 g lemak = 9 kcal. Berapakah tenaga makanan dengan 20 g karbohidrat, 10 g protein dan 5 g lemak?",["35 kcal","135 kcal","165 kcal"],2,"(20×4) + (10×4) + (5×9) = 80 + 40 + 45 = 165 kcal."],
+["Pilih menu sarapan yang paling seimbang.",["Roti bijirin penuh, telur rebus, segelas susu tanpa gula","Nasi lemak, kuih manis, teh tarik","Mi goreng dan sirap"],0,"Menu ini ada karbohidrat, protein dan kalsium, rendah gula dan lemak."],
+["Ali aktif bermain bola setiap hari, Siti kurang aktif. Siapa perlu lebih tenaga?",["Siti","Sama sahaja","Ali"],2,"Keperluan tenaga bergantung kepada umur, jantina dan tahap aktiviti fizikal."]],
+[
+["Amin tidak bersarapan, membeli minuman manis dan snek, lalu sukar fokus di kelas. Nasihat terbaik?",["Minum lebih banyak minuman manis","Bersarapan seimbang dan kurangkan minuman manis","Kurangkan makan tengah hari"],1,"Sarapan seimbang menstabilkan tenaga dan fokus; gula berlebihan menyebabkan tenaga turun mendadak."],
+["Menu sehari: nasi goreng, ayam goreng, teh ais, keropok dan nuget. Apakah kelemahan utamanya?",["Terlalu banyak sayur","Kurang sayur dan buah, tinggi lemak, gula dan garam","Kurang karbohidrat"],1,"Menu ini kekurangan serat dan terlalu tinggi lemak, gula dan garam."],
+["Pak Hamid kerap makan mi segera, ikan masin dan kuah pekat. Risiko kesihatan paling hampir?",["Tekanan darah tinggi","Skurvi","Rabun malam"],0,"Garam berlebihan meningkatkan risiko tekanan darah tinggi dan penyakit jantung."],
+["Minah minum 4 tin minuman bergas sehari. Apakah kesannya jika berterusan?",["Tulang bertambah kuat","Obesiti, kencing manis dan gigi reput","Penghadaman lebih lancar"],1,"Gula berlebihan menyumbang kepada obesiti, diabetes jenis 2 dan gigi reput."],
+["BOSS: Seorang murid lebih berat daripada rakan sebaya dan kurang aktif. Tindakan paling bijak?",["Berhenti makan terus","Pemakanan seimbang Suku-Suku-Separuh, aktif fizikal dan semak carta pertumbuhan dengan pegawai kesihatan","Mengambil pil kurus"],1,"Cara selamat ialah pemakanan seimbang, aktiviti fizikal dan penilaian carta pertumbuhan mengikut umur dan jantina."]]];
+let S,AC;
+const $=id=>document.getElementById(id);
+function show(id){document.querySelectorAll(".scr").forEach(e=>e.classList.toggle("on",e.id==id));window.scrollTo(0,0)}
+function newGame(){S={w:0,qi:0,lives:3,score:0,ok:0,bad:0,done:[0,0,0,0,0],stars:[0,0,0,0,0],wok:0,lock:false,over:false};music();toMap()}
+const hearts=n=>"❤️".repeat(Math.max(n,0))+"🖤".repeat(3-Math.max(n,0));
+const tot=()=>S.stars.reduce((a,b)=>a+b,0);
+function toMap(){if(!S)S={w:0,qi:0,lives:3,score:0,ok:0,bad:0,done:[0,0,0,0,0],stars:[0,0,0,0,0],wok:0,lock:false,over:false};music();
+$("mS").textContent="Mata: "+S.score;$("mL").textContent=hearts(S.lives);$("mT").textContent="⭐ "+tot()+"/15";
+$("mapList").innerHTML=W.map((w,i)=>{const un=i==0||S.done[i-1],dn=S.done[i];
+return `<button class="wc" ${un&&!dn?"":"disabled"} onclick="startW(${i})"><span class="ic">${un?w.i:"🔒"}</span><span><b>${w.n}</b><small>${w.d} · 5 soalan</small><small>${"⭐".repeat(S.stars[i])+"☆".repeat(3-S.stars[i])}</small></span><span class="tag ${un?"":"l"}">${dn?"DONE":un?"UNLOCKED":"LOCKED"}</span></button>`}).join("");show("map")}
+function startW(i){S.w=i;S.qi=0;S.wok=0;const w=W[i],r=document.documentElement.style;r.setProperty("--sky",w.sky);r.setProperty("--gr",w.gr);
+$("boss").style.display=$("hp").style.display=i==4?"block":"none";$("boss").textContent="👾";$("hpb").style.width="100%";show("game");renderQ()}
+function renderQ(){S.lock=false;const q=Q[S.w][S.qi];$("gW").textContent=W[S.w].n;$("gS").textContent="Mata: "+S.score;$("gL").innerHTML=hearts(S.lives);$("gQ").textContent="Soalan "+(S.qi+1)+"/5";
+const p=4+S.qi*15;$("hero").style.left=p+"%";$("blk").style.left=(p+13)+"%";$("blk").className="blk";$("hero").className="hero walk";setTimeout(()=>$("hero").classList.remove("walk"),950);
+$("qt").textContent=q[0];$("fbw").hidden=true;startT();
+$("opts").innerHTML=q[1].map((o,i)=>`<button class="btn opt" onclick="ans(${i})">${"ABC"[i]}. ${o}</button>`).join("")}
+let TM=null,tl=25;
+function updT(){$("tmt").textContent=tl+" s";const b=$("tmb");b.style.width=(tl/25*100)+"%";b.style.background=tl<=5?"var(--red)":tl<=10?"var(--yel)":"var(--grn)"}
+function stopT(){clearInterval(TM);TM=null}
+function startT(){stopT();tl=25;updT();TM=setInterval(()=>{tl--;updT();if(tl>0&&tl<=5)tone(880,.06,"square",.04);if(tl<=0){stopT();ans(-1)}},1000)}
+function ans(i){if(S.lock)return;S.lock=true;stopT();const q=Q[S.w][S.qi],ok=i==q[2],bs=document.querySelectorAll(".opt");
+bs.forEach((b,j)=>{b.disabled=true;if(j==q[2])b.classList.add("ok");else if(j==i)b.classList.add("no")});
+$("hero").classList.add("jump");$("blk").classList.add("hit");
+if(ok){S.score+=100;S.ok++;S.wok++;coin();snd("ok");if(S.w==4){$("hpb").style.width=(100-(S.qi+1)*20)+"%";$("boss").classList.add("hurt");setTimeout(()=>$("boss").classList.remove("hurt"),400)}}
+else{S.lives--;S.bad++;snd("no")}
+$("gS").textContent="Mata: "+S.score;$("gL").innerHTML=hearts(S.lives);
+$("fb").className="fb "+(ok?"ok":"no");$("fb").textContent=ok?"AWESOME! YOU GOT IT!":(i<0?"TIME'S UP! MASA TAMAT!":"OOPS! TRY YOUR BEST!");
+$("ex").textContent="Jawapan betul: "+"ABC"[q[2]]+". "+q[3];
+$("nx").textContent=S.lives<=0?"LIHAT KEPUTUSAN":(S.qi==4?"SELESAI DUNIA":"NEXT");$("fbw").hidden=false}
+function coin(){const c=document.createElement("div");c.className="coin";c.textContent="🪙";c.style.left=$("blk").style.left;c.style.bottom="160px";$("scene").appendChild(c);setTimeout(()=>c.remove(),1000)}
+function next(){if(S.lives<=0){S.over=true;return res()}
+if(S.qi<4){S.qi++;return renderQ()}
+S.stars[S.w]=Math.max(1,Math.min(3,S.wok-2));S.done[S.w]=1;snd("win");
+if(S.w==4){$("boss").textContent="💥";return setTimeout(res,500)}toMap()}
+function res(){const win=!S.over,hi=S.done.lastIndexOf(1)+1;
+$("rT").textContent=win?"YOU WIN! 🏆":"GAME OVER! 💔";
+$("rS").innerHTML=`<div>Markah: ${S.score}</div><div>Betul: ${S.ok} ✔</div><div>Salah: ${S.bad} ✘</div><div>Bintang: ⭐ ${tot()}/15</div><div style="grid-column:1/3">Tahap tertinggi diselesaikan: ${hi?W[hi-1].n:"Belum ada"}</div>`;snd(win?"win":"no");show("result")}
+// bunyi
+let on=true,mt=null,mi=0;
+function ctx(){if(!AC)try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}return AC}
+function tone(f,d,t="square",v=.06,at=0){const a=ctx();if(!a||!on)return;const o=a.createOscillator(),g=a.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(a.destination);const s=a.currentTime+at;o.start(s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.stop(s+d)}
+function slide(f1,f2,d,t,v,at){const a=ctx();if(!a||!on)return;const o=a.createOscillator(),g=a.createGain();o.type=t;const s=a.currentTime+at;o.frequency.setValueAtTime(f1,s);o.frequency.exponentialRampToValueAtTime(f2,s+d);g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g);g.connect(a.destination);o.start(s);o.stop(s+d)}
+function snd(k){if(k=="ok"){[784,988,1175,1568].forEach((f,i)=>{tone(f,.18,"triangle",.09,i*.07);tone(f*2,.1,"sine",.03,i*.07)})}else if(k=="no"){slide(392,370,.25,"sawtooth",.07,0);slide(370,350,.25,"sawtooth",.07,.3);slide(350,330,.25,"sawtooth",.07,.6);slide(330,150,.8,"sawtooth",.08,.9);slide(180,520,.18,"sine",.12,1.75)}else if(k=="win"){[523,659,784,1047,784,1047,1319].forEach((f,i)=>{tone(f,.22,"square",.06,i*.13);tone(f*1.5,.22,"triangle",.04,i*.13)});[1047,1319,1568].forEach(f=>tone(f,.7,"triangle",.07,.95))}}
+let bgm=null;
+function music(){if(bgm){if(on)bgm.play().catch(()=>{});return}if(mt)return;const n=[523,659,784,659,587,698,880,698];mt=setInterval(()=>{if(on&&!bgm){tone(n[mi++%8],.2,"triangle",.035)}},280)}
+function togSnd(){on=!on;$("snd").textContent=on?"🔊":"🔇";if(bgm){on?bgm.play().catch(()=>{}):bgm.pause()}if(on){ctx();music()}}
+document.addEventListener("click",()=>{ctx();music()},{once:true});
+</script></body></html>
